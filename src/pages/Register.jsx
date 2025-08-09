@@ -95,17 +95,6 @@ const Register = ({ onSubmit, onGoogle }) => {
           <div className="grid md:grid-cols-2">
             <div className="hidden md:flex items-center p-10">
               <div className="w-full">
-                <span className="inline-block rounded-full bg-blue-50 text-blue-700 text-xs font-semibold tracking-widest px-3 py-1">
-                  TaskForce
-                </span>
-                <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900">
-                  Welcome! Let’s get you set up
-                </h2>
-                <p className="mt-2 text-gray-600">
-                  Create an account to post tasks, hire pros, and start getting
-                  things done.
-                </p>
-
                 <div className="mt-6 rounded-2xl ring-1 ring-gray-100 bg-gradient-to-br from-white to-gray-50 shadow-sm p-2">
                   <Lottie
                     animationData={registerLottie}
