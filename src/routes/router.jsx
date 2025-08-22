@@ -63,7 +63,11 @@ const router = createBrowserRouter([
         ),
       },
       { path: "/task/:id", 
-        Component: SeeDetails 
+        element: (
+          <PrivateRoute>
+            <SeeDetails></SeeDetails>
+          </PrivateRoute>
+        ),
       },
     ],
   },
