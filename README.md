@@ -112,7 +112,7 @@ freelance-client/
 1. **Clone the repository**
 
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Akhlakur07/freelance-web-client.git
    cd freelance-web/freelance-client
    ```
 
@@ -203,18 +203,12 @@ freelance-client/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Contact
-
-- **Project Link:** [https://github.com/yourusername/freelance-web](https://github.com/yourusername/freelance-web)
-- **Live Demo:** [https://freelance-auth-96883.web.app/](https://freelance-auth-96883.web.app/)
-
 ## 🙏 Acknowledgments
 
 - Firebase for backend services
 - React team for the amazing framework
 - Tailwind CSS for the utility-first approach
 - Framer Motion for smooth animations
-- DaisyUI for beautiful components
 
 ---
 
