@@ -2,6 +2,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../context/AuthContext";
+import Swal from "sweetalert2";
 
 const MyTasks = () => {
   const { user } = useContext(AuthContext);
@@ -10,6 +11,7 @@ const MyTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [deleting, setDeleting] = useState(new Set()); // track deleting ids
 
   useEffect(() => {
     if (!user?.email) {
@@ -68,6 +70,56 @@ const MyTasks = () => {
     }
   };
 
+  const handleDelete = async (task) => {
+    const confirm = await Swal.fire({
+      title: `Delete “${task.title}”?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc2626",
+    });
+    if (!confirm.isConfirmed) return;
+
+    // mark as deleting
+    setDeleting((prev) => {
+      const next = new Set(prev);
+      next.add(task._id);
+      return next;
+    });
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/tasks/${task._id}?email=${encodeURIComponent(
+          user.email
+        )}`,
+        { method: "DELETE" }
+      );
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || "Failed to delete");
+
+      // remove from UI
+      setTasks((prev) => prev.filter((t) => t._id !== task._id));
+
+      await Swal.fire({
+        title: "Deleted",
+        text: "The task has been removed.",
+        icon: "success",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (e) {
+      await Swal.fire("Delete failed", e.message || "Something went wrong.", "error");
+    } finally {
+      setDeleting((prev) => {
+        const next = new Set(prev);
+        next.delete(task._id);
+        return next;
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,48 +174,57 @@ const MyTasks = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
-                  {tasks.map((t) => (
-                    <tr key={t._id}>
-                      <td className="px-4 py-3 text-sm text-gray-900">{t.title}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{t.category}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{fmtDate(t.deadline)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
-                        {typeof t.budget === "number" ? t.budget : "—"}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            type="button"
-                            className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm"
-                            onClick={() => {}}
-                            title="Update (not implemented)"
-                          >
-                            Update
-                          </button>
-                          <button
-                            type="button"
-                            className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm"
-                            onClick={() => {}}
-                            title="Delete (not implemented)"
-                          >
-                            Delete
-                          </button>
-                          <button
-                            type="button"
-                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm"
-                            onClick={() => {}}
-                            title="Bids (not implemented)"
-                          >
-                            Bids
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {tasks.map((t) => {
+                    const isDeleting = deleting.has(t._id);
+                    return (
+                      <tr key={t._id}>
+                        <td className="px-4 py-3 text-sm text-gray-900">{t.title}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700">{t.category}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700">{fmtDate(t.deadline)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-700">
+                          {typeof t.budget === "number" ? t.budget : "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              type="button"
+                              className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm"
+                              onClick={() => {}}
+                              title="Update (not implemented)"
+                            >
+                              Update
+                            </button>
+                            <button
+                              type="button"
+                              className={`px-3 py-1.5 rounded-lg border text-sm ${
+                                isDeleting
+                                  ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
+                                  : "border-gray-200 hover:bg-gray-50"
+                              }`}
+                              onClick={() => handleDelete(t)}
+                              disabled={isDeleting}
+                              aria-busy={isDeleting}
+                              title="Delete"
+                            >
+                              {isDeleting ? "Deleting..." : "Delete"}
+                            </button>
+                            <button
+                              type="button"
+                              className="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm"
+                              onClick={() => {}}
+                              title="Bids (not implemented)"
+                            >
+                              Bids
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               <p className="mt-3 text-xs text-gray-500">
-                Tip: Real privacy requires server-side auth checks; the UI only requests your tasks.
+                Note: Only your tasks are requested and shown. Proper server-side checks enforce ownership on delete.
               </p>
             </div>
           )}
