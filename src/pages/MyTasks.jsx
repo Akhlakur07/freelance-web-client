@@ -11,7 +11,10 @@ const MyTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-  const [deleting, setDeleting] = useState(new Set()); // track deleting ids
+  const [deleting, setDeleting] = useState(new Set());
+  // MyTasks.jsx (add near other useState hooks)
+  const [checkingBids, setCheckingBids] = useState(new Set());
+  const plural = (n, s, p = s + "s") => (Number(n) === 1 ? s : p);
 
   useEffect(() => {
     if (!user?.email) {
@@ -130,6 +133,53 @@ const MyTasks = () => {
     }
   };
 
+  // MyTasks.jsx (add this handler below handleDelete)
+  const handleBids = async (task) => {
+    // mark as checking
+    setCheckingBids((prev) => {
+      const next = new Set(prev);
+      next.add(task._id);
+      return next;
+    });
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/tasks/${encodeURIComponent(task._id)}`
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Failed to load bids");
+
+      const count = Number(data?.bidsCount ?? task.bidsCount ?? 0);
+
+      // keep table in sync with latest count
+      setTasks((prev) =>
+        prev.map((t) => (t._id === task._id ? { ...t, bidsCount: count } : t))
+      );
+
+      await Swal.fire({
+        title: `${count} ${plural(count, "Bid")}`,
+        html: `This task currently has <b>${count}</b> ${plural(
+          count,
+          "bid"
+        )}.`,
+        icon: "info",
+        confirmButtonText: "OK",
+      });
+    } catch (e) {
+      await Swal.fire(
+        "Couldn’t load bids",
+        e.message || "Something went wrong.",
+        "error"
+      );
+    } finally {
+      setCheckingBids((prev) => {
+        const next = new Set(prev);
+        next.delete(task._id);
+        return next;
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -236,11 +286,22 @@ const MyTasks = () => {
                             </button>
                             <button
                               type="button"
-                              className="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm"
-                              onClick={() => {}}
-                              title="Bids (not implemented)"
+                              className={`px-3 py-1.5 rounded-lg text-sm ${
+                                checkingBids.has(t._id)
+                                  ? "bg-blue-600/60 text-white cursor-wait"
+                                  : "bg-blue-600 text-white hover:bg-blue-700"
+                              }`}
+                              onClick={() => handleBids(t)}
+                              disabled={checkingBids.has(t._id)}
+                              title="See bids count"
                             >
-                              Bids
+                              {checkingBids.has(t._id)
+                                ? "Checking…"
+                                : `Bids${
+                                    typeof t.bidsCount === "number"
+                                      ? ` (${t.bidsCount})`
+                                      : ""
+                                  }`}
                             </button>
                           </div>
                         </td>

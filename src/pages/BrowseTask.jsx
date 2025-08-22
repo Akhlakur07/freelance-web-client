@@ -30,7 +30,6 @@ const BrowseTask = () => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
-  // simple client-side filters
   const [category, setCategory] = useState("All");
   const [q, setQ] = useState("");
 
@@ -41,17 +40,12 @@ const BrowseTask = () => {
       setLoading(true);
       setErr("");
       try {
-        // If you prefer server-side category filtering:
-        // const url = new URL("http://localhost:3000/tasks");
-        // if (category && category !== "All") url.searchParams.set("category", category);
-        // const res = await fetch(url.toString(), { signal: controller.signal });
-
         const res = await fetch("http://localhost:3000/tasks", {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error((await res.text()) || "Failed to load tasks");
         const data = await res.json();
-        // Normalize id shape (_id may be string; sometimes you might return id)
+
         const normalized = Array.isArray(data)
           ? data.map((t) => ({ ...t, id: t.id || t._id }))
           : [];
@@ -79,7 +73,6 @@ const BrowseTask = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header + Filters */}
         <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">Browse Tasks</h1>
