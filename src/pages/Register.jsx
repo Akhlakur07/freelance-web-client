@@ -1,84 +1,119 @@
 // Register.jsx
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Lottie from "lottie-react";
 import registerLottie from "../assets/lottie/Register.json";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { AuthContext } from "../context/AuthContext";
 
-const Register = ({ onSubmit, onGoogle }) => {
+const Register = () => {
+  const navigate = useNavigate();
+  const { createUser, googleSignin } = useContext(AuthContext);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
-    photoURL: "",
     password: "",
+    photoURL: "",
+    bio: "",
   });
-  const [showPass, setShowPass] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPass, setShowPass] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const handleChange = (e) => {
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  };
+
   const validate = () => {
-    const e = {};
-    if (!form.name.trim()) e.name = "Name is required.";
-    if (!form.email.trim()) e.email = "Email is required.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      e.email = "Enter a valid email.";
-
-    if (!form.password) {
-      e.password = "Password is required.";
+    const next = {};
+    if (!form.name.trim()) next.name = "Name is required.";
+    if (!form.email.trim()) next.email = "Email is required.";
+    if (form.email && !/^\S+@\S+\.\S+$/.test(form.email))
+      next.email = "Enter a valid email.";
+    if (form.password.length < 6) {
+      next.password = "Password must be at least 6 characters.";
     } else {
-      if (form.password.length < 6) {
-        e.password = "Password must be at least 6 characters.";
-      } else if (!/[A-Z]/.test(form.password)) {
-        e.password = "Password must contain at least one uppercase letter.";
-      } else if (!/[a-z]/.test(form.password)) {
-        e.password = "Password must contain at least one lowercase letter.";
-      }
+      if (!/[A-Z]/.test(form.password))
+        next.password = "Include at least one uppercase letter.";
+      if (!/[a-z]/.test(form.password))
+        next.password = (next.password ? next.password + " " : "") + "Include at least one lowercase letter.";
     }
-    return e;
+    return next;
+    };
+
+  const saveUserToBackend = async (payload) => {
+    const res = await fetch("http://localhost:3000/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "Failed to save user");
+    }
+    return res.json();
   };
 
-  const handleChange = (ev) => {
-    const { name, value } = ev.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-
-  const handleRegister = async (ev) => {
-    ev.preventDefault();
-    const e = validate();
-    setErrors(e);
-    if (Object.keys(e).length) return;
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErrors({});
+    const v = validate();
+    if (Object.keys(v).length) {
+      setErrors(v);
+      return;
+    }
 
     try {
       setSubmitting(true);
-      if (typeof onSubmit === "function") {
-        await onSubmit(form);
-      } else {
-        console.log("Register submit:", form);
+      const result = await createUser(form.email, form.password);
+
+      // Optional: set displayName/photo on Firebase user if available
+      if (result?.user?.updateProfile) {
+        try {
+          await result.user.updateProfile({
+            displayName: form.name,
+            photoURL: form.photoURL || undefined,
+          });
+        } catch {
+          /* non-fatal */
+        }
       }
+
+      const saveUser = {
+        name: form.name,
+        email: form.email,
+        photo: form.photoURL,
+        bio: form.bio,
+        authProvider: "password",
+        createdAt: new Date().toISOString(),
+      };
+
+      await saveUserToBackend(saveUser);
+      navigate("/");
     } catch (err) {
-      console.error(err);
-      setErrors((prev) => ({
-        ...prev,
-        _global: "Registration failed. Try again.",
-      }));
+      setErrors({ _global: err.message || "Registration failed." });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleGoogle = async () => {
+    setErrors({});
     try {
       setSubmitting(true);
-      if (typeof onGoogle === "function") {
-        await onGoogle();
-      } else {
-        console.log("Google login clicked");
-      }
+      const { user } = await googleSignin();
+      const payload = {
+        name: user?.displayName || "",
+        email: user?.email || "",
+        photo: user?.photoURL || "",
+        bio: "",
+        authProvider: "google",
+        createdAt: new Date().toISOString(),
+      };
+      await saveUserToBackend(payload);
+      navigate("/");
     } catch (err) {
-      console.error(err);
-      setErrors((prev) => ({
-        ...prev,
-        _global: "Google login failed. Try again.",
-      }));
+      setErrors({ _global: err.message || "Google sign-in failed." });
     } finally {
       setSubmitting(false);
     }
@@ -87,20 +122,13 @@ const Register = ({ onSubmit, onGoogle }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Unified section card */}
         <section className="relative rounded-3xl bg-white/90 backdrop-blur-sm shadow-lg">
-          {/* Divider (vertical only on lg) */}
           <div className="absolute inset-y-0 left-1/2 w-px bg-gray-100 hidden lg:block" />
-
           <div className="grid md:grid-cols-2">
             <div className="hidden md:flex items-center p-10">
               <div className="w-full">
                 <div className="mt-6 rounded-2xl ring-1 ring-gray-100 bg-gradient-to-br from-white to-gray-50 shadow-sm p-2">
-                  <Lottie
-                    animationData={registerLottie}
-                    loop
-                    className="w-full max-h-[520px]"
-                  />
+                  <Lottie animationData={registerLottie} loop className="w-full max-h-[520px]" />
                 </div>
               </div>
             </div>
@@ -108,12 +136,8 @@ const Register = ({ onSubmit, onGoogle }) => {
             {/* Form side */}
             <div className="p-6 sm:p-8 lg:p-10">
               <div className="max-w-md">
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Create your account
-                </h1>
-                <p className="mt-1 text-sm text-gray-600">
-                  Use your email to sign up or continue with Google.
-                </p>
+                <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
+                <p className="mt-1 text-sm text-gray-600">Use your email to sign up or continue with Google.</p>
 
                 {errors._global && (
                   <div className="mt-4 rounded-xl bg-red-50 text-red-700 px-4 py-3 text-sm">
@@ -124,10 +148,7 @@ const Register = ({ onSubmit, onGoogle }) => {
                 <form onSubmit={handleRegister} className="mt-6 space-y-4">
                   {/* Name */}
                   <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                       Name
                     </label>
                     <input
@@ -140,17 +161,12 @@ const Register = ({ onSubmit, onGoogle }) => {
                       placeholder="Jane Doe"
                       className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none"
                     />
-                    {errors.name && (
-                      <p className="mt-1 text-xs text-red-600">{errors.name}</p>
-                    )}
+                    {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                       Email
                     </label>
                     <input
@@ -163,19 +179,12 @@ const Register = ({ onSubmit, onGoogle }) => {
                       placeholder="you@example.com"
                       className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none"
                     />
-                    {errors.email && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {errors.email}
-                      </p>
-                    )}
+                    {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
                   </div>
 
                   {/* Photo URL */}
                   <div>
-                    <label
-                      htmlFor="photoURL"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="photoURL" className="block text-sm font-medium text-gray-700">
                       Photo URL
                     </label>
                     <input
@@ -189,12 +198,25 @@ const Register = ({ onSubmit, onGoogle }) => {
                     />
                   </div>
 
+                  {/* Bio */}
+                  <div>
+                    <label htmlFor="bio" className="block text-sm font-medium text-gray-700">
+                      Bio
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      rows="3"
+                      value={form.bio}
+                      onChange={handleChange}
+                      placeholder="A sentence about you..."
+                      className="mt-1 w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none"
+                    />
+                  </div>
+
                   {/* Password */}
                   <div>
-                    <label
-                      htmlFor="password"
-                      className="block text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                       Password
                     </label>
                     <div className="mt-1 relative">
@@ -212,45 +234,26 @@ const Register = ({ onSubmit, onGoogle }) => {
                         type="button"
                         onClick={() => setShowPass((s) => !s)}
                         className="absolute inset-y-0 right-2 my-auto h-9 px-3 rounded-lg text-gray-600 hover:bg-gray-100"
-                        aria-label={
-                          showPass ? "Hide password" : "Show password"
-                        }
+                        aria-label={showPass ? "Hide password" : "Show password"}
                       >
                         {showPass ? (
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
+                          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M3 3l18 18" />
                             <path d="M10.6 10.6a3 3 0 104.24 4.24" />
                             <path d="M9.88 4.24A9.76 9.76 0 0121 12a9.77 9.77 0 01-2.1 3.34" />
                             <path d="M6.1 6.1A9.76 9.76 0 003 12a9.77 9.77 0 006.34 5.9" />
                           </svg>
                         ) : (
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
+                          <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
                             <circle cx="12" cy="12" r="3" />
                           </svg>
                         )}
                       </button>
                     </div>
-                    {errors.password && (
-                      <p className="mt-1 text-xs text-red-600">
-                        {errors.password}
-                      </p>
-                    )}
+                    {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password}</p>}
                     <p className="mt-1 text-[11px] text-gray-500">
-                      Must include at least 6 characters, one uppercase (A-Z),
-                      and one lowercase (a-z).
+                      Must include at least 6 characters, one uppercase (A-Z), and one lowercase (a-z).
                     </p>
                   </div>
 
@@ -269,9 +272,7 @@ const Register = ({ onSubmit, onGoogle }) => {
                       <div className="w-full border-t border-gray-200" />
                     </div>
                     <div className="relative flex justify-center">
-                      <span className="bg-white px-3 text-xs text-gray-500">
-                        or continue with
-                      </span>
+                      <span className="bg-white px-3 text-xs text-gray-500">or continue with</span>
                     </div>
                   </div>
 
@@ -282,27 +283,11 @@ const Register = ({ onSubmit, onGoogle }) => {
                     disabled={submitting}
                     className="w-full rounded-xl border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed text-gray-800 font-semibold py-2.5 shadow-sm inline-flex items-center justify-center gap-2 transition"
                   >
-                    <svg
-                      viewBox="0 0 533.5 544.3"
-                      className="w-5 h-5"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fill="#4285F4"
-                        d="M533.5 278.4c0-18.6-1.7-37-5.2-54.8H272.1v103.7h147c-6.3 34-25 62.7-53.5 81.9v67h86.5c50.6-46.6 81.4-115.3 81.4-197.8z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M272.1 544.3c72.3 0 133.1-23.9 177.5-65.1l-86.5-67c-24 16.1-54.7 25.6-91 25.6-69.9 0-129.3-47.2-150.5-110.6H32.7v69.6c44.6 88.4 136.5 147.5 239.4 147.5z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M121.6 327.2c-10.1-29.9-10.1-62.1 0-92l.1-69.6H32.7c-42.9 85-42.9 186.2 0 271.2l88.9-69.6z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M272.1 107.7c39.3-.6 77.4 13.6 106.9 39.9l79.6-79.6C410.8 24.2 343.6-0.3 272.1 0 169.2 0 77.3 59.1 32.7 147.5l88.9 69.6C143 153.7 202.3 107.7 272.1 107.7z"
-                      />
+                    <svg viewBox="0 0 533.5 544.3" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="#4285F4" d="M533.5 278.4c0-18.6-1.7-37-5.2-54.8H272.1v103.7h147c-6.3 34-25 62.7-53.5 81.9v67h86.5c50.6-46.6 81.4-115.3 81.4-197.8z" />
+                      <path fill="#34A853" d="M272.1 544.3c72.3 0 133.1-23.9 177.5-65.1l-86.5-67c-24 16.1-54.7 25.6-91 25.6-69.9 0-129.3-47.2-150.5-110.6H32.7v69.6c44.6 88.4 136.5 147.5 239.4 147.5z" />
+                      <path fill="#FBBC05" d="M121.6 327.2c-10.1-29.9-10.1-62.1 0-92l.1-69.6H32.7c-42.9 85-42.9 186.2 0 271.2l88.9-69.6z" />
+                      <path fill="#EA4335" d="M272.1 107.7c39.3-.6 77.4 13.6 106.9 39.9l79.6-79.6C410.8 24.2 343.6-0.3 272.1 0 169.2 0 77.3 59.1 32.7 147.5l88.9 69.6C143 153.7 202.3 107.7 272.1 107.7z" />
                     </svg>
                     Continue with Google
                   </button>

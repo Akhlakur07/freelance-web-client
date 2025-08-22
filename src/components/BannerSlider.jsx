@@ -1,7 +1,7 @@
 // BannerSlider.jsx
 import React, { useEffect, useRef, useState, useCallback } from "react";
 
-const BannerSlider = ({ slides = [], autoPlayMs = 3000, className = "" }) => {
+const BannerSlider = ({ slides = [], autoPlayMs = 2500, className = "" }) => {
   const [index, setIndex] = useState(0);
   const timerRef = useRef(null);
   const hoverRef = useRef(false);
