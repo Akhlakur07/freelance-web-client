@@ -9,11 +9,14 @@ import BrowseTask from "../pages/BrowseTask";
 import PrivateRoute from "../components/PrivateRoute";
 import MyTasks from "../pages/MyTasks";
 import UpdateTask from "../pages/UpdateTask";
+import SeeDetails from "../pages/SeeDetails";
+import Error from "../pages/Error";
 
 const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
+    errorElement: <Error/>,
     children: [
       {
         index: true,
@@ -40,12 +43,8 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/browse-task",
-        element: (
-          <PrivateRoute>
-            <BrowseTask></BrowseTask>
-          </PrivateRoute>
-        ),
+        path: "/browse-tasks",
+        element: <BrowseTask></BrowseTask>,
       },
       {
         path: "/my-tasks",
@@ -62,6 +61,9 @@ const router = createBrowserRouter([
             <UpdateTask></UpdateTask>
           </PrivateRoute>
         ),
+      },
+      { path: "/task/:id", 
+        Component: SeeDetails 
       },
     ],
   },
