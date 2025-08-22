@@ -4,6 +4,7 @@ import Home from "../pages/Home";
 import Register from "../pages/Register";
 import Login from "../pages/Login";
 import Profile from "../pages/Profile";
+import AddTask from "../pages/AddTask";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
       {
         path:"/profile",
         Component: Profile
+      },
+      {
+        path:"/add-task",
+        Component: AddTask
       }
     ],
   },
