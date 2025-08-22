@@ -29,11 +29,13 @@ const MyTasks = () => {
           `http://localhost:3000/tasks?email=${encodeURIComponent(user.email)}`,
           { signal: controller.signal }
         );
-        if (!res.ok) throw new Error((await res.text()) || "Failed to load tasks");
+        if (!res.ok)
+          throw new Error((await res.text()) || "Failed to load tasks");
         const data = await res.json();
         setTasks(Array.isArray(data) ? data : []);
       } catch (e) {
-        if (e.name !== "AbortError") setErr(e.message || "Failed to load tasks");
+        if (e.name !== "AbortError")
+          setErr(e.message || "Failed to load tasks");
       } finally {
         setLoading(false);
       }
@@ -47,8 +49,12 @@ const MyTasks = () => {
     return (
       <div className="max-w-5xl mx-auto p-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-semibold text-gray-900">Please log in</h1>
-          <p className="mt-2 text-gray-600">You can only view your own tasks after logging in.</p>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Please log in
+          </h1>
+          <p className="mt-2 text-gray-600">
+            You can only view your own tasks after logging in.
+          </p>
           <button
             onClick={() => navigate("/login")}
             className="mt-6 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
@@ -110,7 +116,11 @@ const MyTasks = () => {
         showConfirmButton: false,
       });
     } catch (e) {
-      await Swal.fire("Delete failed", e.message || "Something went wrong.", "error");
+      await Swal.fire(
+        "Delete failed",
+        e.message || "Something went wrong.",
+        "error"
+      );
     } finally {
       setDeleting((prev) => {
         const next = new Set(prev);
@@ -126,8 +136,12 @@ const MyTasks = () => {
         <div className="rounded-3xl bg-white/90 backdrop-blur-sm shadow-lg p-6 sm:p-8">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">My Posted Tasks</h1>
-              <p className="text-sm text-gray-600">Only your tasks are shown here.</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                My Posted Tasks
+              </h1>
+              <p className="text-sm text-gray-600">
+                Only your tasks are shown here.
+              </p>
             </div>
             <button
               onClick={() => navigate("/add-task")}
@@ -178,9 +192,15 @@ const MyTasks = () => {
                     const isDeleting = deleting.has(t._id);
                     return (
                       <tr key={t._id}>
-                        <td className="px-4 py-3 text-sm text-gray-900">{t.title}</td>
-                        <td className="px-4 py-3 text-sm text-gray-700">{t.category}</td>
-                        <td className="px-4 py-3 text-sm text-gray-700">{fmtDate(t.deadline)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          {t.title}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700">
+                          {t.category}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-700">
+                          {fmtDate(t.deadline)}
+                        </td>
                         <td className="px-4 py-3 text-sm text-gray-700">
                           {typeof t.budget === "number" ? t.budget : "—"}
                         </td>
@@ -189,7 +209,13 @@ const MyTasks = () => {
                             <button
                               type="button"
                               className="px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-sm"
-                              onClick={() => {}}
+                              onClick={() =>
+                                navigate(
+                                  `/update-task/${encodeURIComponent(
+                                    t.id || t._id
+                                  )}`
+                                )
+                              }
                               title="Update (not implemented)"
                             >
                               Update
@@ -224,7 +250,8 @@ const MyTasks = () => {
                 </tbody>
               </table>
               <p className="mt-3 text-xs text-gray-500">
-                Note: Only your tasks are requested and shown. Proper server-side checks enforce ownership on delete.
+                Note: Only your tasks are requested and shown. Proper
+                server-side checks enforce ownership on delete.
               </p>
             </div>
           )}
