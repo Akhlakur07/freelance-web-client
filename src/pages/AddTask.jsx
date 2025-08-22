@@ -54,24 +54,6 @@ const AddTask = () => {
     };
   }, [user?.email, user?.displayName]);
 
-  if (!user) {
-    return (
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-semibold text-gray-900">Please log in</h1>
-          <p className="mt-2 text-gray-600">
-            You need to be logged in to post a task.
-          </p>
-          <button
-            onClick={() => navigate("/login")}
-            className="mt-6 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
