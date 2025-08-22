@@ -203,6 +203,10 @@ freelance-client/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 📞 Contact
+
+- **Backend Repository:** [https://github.com/Akhlakur07/freelance-web-server](https://github.com/Akhlakur07/freelance-web-server)
+
 ## 🙏 Acknowledgments
 
 - Firebase for backend services
