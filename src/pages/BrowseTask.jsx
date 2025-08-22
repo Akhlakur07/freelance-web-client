@@ -40,10 +40,14 @@ const BrowseTask = () => {
       setLoading(true);
       setErr("");
       try {
-        const res = await fetch("http://localhost:3000/tasks", {
-          signal: controller.signal,
-        });
-        if (!res.ok) throw new Error((await res.text()) || "Failed to load tasks");
+        const res = await fetch(
+          "https://freelance-server-phi.vercel.app/tasks",
+          {
+            signal: controller.signal,
+          }
+        );
+        if (!res.ok)
+          throw new Error((await res.text()) || "Failed to load tasks");
         const data = await res.json();
 
         const normalized = Array.isArray(data)
@@ -51,7 +55,8 @@ const BrowseTask = () => {
           : [];
         setTasks(normalized);
       } catch (e) {
-        if (e.name !== "AbortError") setErr(e.message || "Failed to load tasks");
+        if (e.name !== "AbortError")
+          setErr(e.message || "Failed to load tasks");
       } finally {
         setLoading(false);
       }
@@ -64,7 +69,13 @@ const BrowseTask = () => {
   const filtered = useMemo(() => {
     return tasks.filter((t) => {
       const byCat = category === "All" || t.category === category;
-      const text = (t.title + " " + t.description + " " + (t.category || "")).toLowerCase();
+      const text = (
+        t.title +
+        " " +
+        t.description +
+        " " +
+        (t.category || "")
+      ).toLowerCase();
       const byQ = !q.trim() || text.includes(q.trim().toLowerCase());
       return byCat && byQ;
     });
@@ -77,7 +88,8 @@ const BrowseTask = () => {
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">Browse Tasks</h1>
             <p className="text-sm text-gray-600">
-              Explore what others have posted. Click “See Details” to view a task.
+              Explore what others have posted. Click “See Details” to view a
+              task.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">

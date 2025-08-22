@@ -17,7 +17,9 @@ const Navbar = () => {
       if (!user?.email) return;
       try {
         const res = await fetch(
-          `http://localhost:3000/users/${encodeURIComponent(user.email)}`
+          `https://freelance-server-phi.vercel.app/users/${encodeURIComponent(
+            user.email
+          )}`
         );
         if (!res.ok) return; // ignore if not found
         const data = await res.json();

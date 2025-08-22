@@ -69,13 +69,25 @@ const Icon = ({ name, className = "h-5 w-5" }) => {
       );
     case "shield":
       return (
-        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          viewBox="0 0 24 24"
+          className={className}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M12 3l7 4v5a9 9 0 11-14 0V7l7-4z" />
         </svg>
       );
     case "sparkles":
       return (
-        <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          viewBox="0 0 24 24"
+          className={className}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5zM19 13l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" />
         </svg>
       );
@@ -127,12 +139,16 @@ const TaskCard = ({ i, t, onSee }) => (
     className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm hover:shadow transition"
   >
     <div className="flex items-start justify-between gap-3">
-      <h4 className="text-lg font-semibold text-gray-900 line-clamp-2">{t.title}</h4>
+      <h4 className="text-lg font-semibold text-gray-900 line-clamp-2">
+        {t.title}
+      </h4>
       <span className="shrink-0 rounded-full bg-blue-50 text-blue-700 px-2.5 py-1 text-xs font-medium">
         {t.category || "—"}
       </span>
     </div>
-    <p className="mt-2 text-sm text-gray-700 line-clamp-3">{t.description || "No description."}</p>
+    <p className="mt-2 text-sm text-gray-700 line-clamp-3">
+      {t.description || "No description."}
+    </p>
     <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
       <div className="rounded-xl bg-gray-50 px-3 py-2">
         <dt className="text-gray-500">Budget</dt>
@@ -171,9 +187,14 @@ const Home = () => {
     const controller = new AbortController();
     (async () => {
       try {
-        const res = await fetch("http://localhost:3000/tasks", { signal: controller.signal });
+        const res = await fetch(
+          "https://freelance-server-phi.vercel.app/tasks",
+          { signal: controller.signal }
+        );
         const data = await res.json();
-        const normalized = Array.isArray(data) ? data.map((d) => ({ ...d, id: d.id || d._id })) : [];
+        const normalized = Array.isArray(data)
+          ? data.map((d) => ({ ...d, id: d.id || d._id }))
+          : [];
         setTasks(normalized.slice(0, 6));
       } catch {
         setTasks([]);
@@ -251,14 +272,18 @@ const Home = () => {
           viewport={{ once: true }}
         >
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <h3 className="text-lg font-semibold text-gray-900">Browse by Category</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Browse by Category
+            </h3>
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((c, i) => (
                 <CategoryChip
                   key={c}
                   i={i}
                   label={c}
-                  onClick={() => navigate(`/browse-tasks?category=${encodeURIComponent(c)}`)}
+                  onClick={() =>
+                    navigate(`/browse-tasks?category=${encodeURIComponent(c)}`)
+                  }
                 />
               ))}
             </div>
@@ -276,8 +301,12 @@ const Home = () => {
           viewport={{ once: true }}
         >
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Latest tasks</h2>
-            <p className="text-sm text-gray-600">Fresh opportunities from the community.</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              Latest tasks
+            </h2>
+            <p className="text-sm text-gray-600">
+              Fresh opportunities from the community.
+            </p>
           </div>
           <Link
             to="/browse-tasks"
@@ -299,7 +328,10 @@ const Home = () => {
         ) : tasks.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-8 text-center text-gray-600">
             No tasks yet. Be the first to{" "}
-            <Link to="/add-task" className="text-blue-600 underline underline-offset-2">
+            <Link
+              to="/add-task"
+              className="text-blue-600 underline underline-offset-2"
+            >
               post a task
             </Link>
             .
@@ -328,18 +360,26 @@ const Home = () => {
             whileInView="show"
             viewport={{ once: true }}
           >
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">How it works</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              How it works
+            </h2>
             <ol className="space-y-3 text-sm text-gray-700">
               <li className="flex gap-3">
-                <span className="h-7 w-7 shrink-0 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-semibold">1</span>
+                <span className="h-7 w-7 shrink-0 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-semibold">
+                  1
+                </span>
                 Post your task with scope, budget, and deadline.
               </li>
               <li className="flex gap-3">
-                <span className="h-7 w-7 shrink-0 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-semibold">2</span>
+                <span className="h-7 w-7 shrink-0 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-semibold">
+                  2
+                </span>
                 Review bids and profiles from interested pros.
               </li>
               <li className="flex gap-3">
-                <span className="h-7 w-7 shrink-0 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-semibold">3</span>
+                <span className="h-7 w-7 shrink-0 rounded-full bg-blue-600 text-white grid place-items-center text-xs font-semibold">
+                  3
+                </span>
                 Pick the match and get it shipped.
               </li>
             </ol>
@@ -431,8 +471,12 @@ const Home = () => {
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold">Ready to get something off your plate?</h3>
-              <p className="text-sm text-white/80">Post a task today and start getting bids.</p>
+              <h3 className="text-xl sm:text-2xl font-bold">
+                Ready to get something off your plate?
+              </h3>
+              <p className="text-sm text-white/80">
+                Post a task today and start getting bids.
+              </p>
             </div>
             <div className="flex gap-3">
               <Link

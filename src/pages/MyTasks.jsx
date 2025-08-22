@@ -29,7 +29,9 @@ const MyTasks = () => {
       setErr("");
       try {
         const res = await fetch(
-          `http://localhost:3000/tasks?email=${encodeURIComponent(user.email)}`,
+          `https://freelance-server-phi.vercel.app/tasks?email=${encodeURIComponent(
+            user.email
+          )}`,
           { signal: controller.signal }
         );
         if (!res.ok)
@@ -100,9 +102,9 @@ const MyTasks = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/tasks/${task._id}?email=${encodeURIComponent(
-          user.email
-        )}`,
+        `https://freelance-server-phi.vercel.app/tasks/${
+          task._id
+        }?email=${encodeURIComponent(user.email)}`,
         { method: "DELETE" }
       );
       const text = await res.text();
@@ -144,7 +146,9 @@ const MyTasks = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/tasks/${encodeURIComponent(task._id)}`
+        `https://freelance-server-phi.vercel.app/tasks/${encodeURIComponent(
+          task._id
+        )}`
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to load bids");

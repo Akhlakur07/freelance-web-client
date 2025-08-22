@@ -36,7 +36,9 @@ const AddTask = () => {
       if (!user?.email) return setProfileName(user?.displayName || "");
       try {
         const res = await fetch(
-          `http://localhost:3000/users/${encodeURIComponent(user.email)}`
+          `https://freelance-server-phi.vercel.app/users/${encodeURIComponent(
+            user.email
+          )}`
         );
         if (res.ok) {
           const data = await res.json();
@@ -53,7 +55,6 @@ const AddTask = () => {
       cancelled = true;
     };
   }, [user?.email, user?.displayName]);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +88,7 @@ const AddTask = () => {
         userEmail: user.email,
         userName: profileName || user.displayName || "",
       };
-      const res = await fetch("http://localhost:3000/tasks", {
+      const res = await fetch("https://freelance-server-phi.vercel.app/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -119,7 +120,10 @@ const AddTask = () => {
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="title">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="title"
+            >
               Task Title
             </label>
             <input
@@ -136,7 +140,10 @@ const AddTask = () => {
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="category">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="category"
+            >
               Category
             </label>
             <select
@@ -160,7 +167,10 @@ const AddTask = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="description">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="description"
+            >
               Description
             </label>
             <textarea
@@ -178,7 +188,10 @@ const AddTask = () => {
           {/* Deadline & Budget */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="deadline">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="deadline"
+              >
                 Deadline
               </label>
               <input
@@ -193,7 +206,10 @@ const AddTask = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="budget">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="budget"
+              >
                 Budget
               </label>
               <input
@@ -214,7 +230,10 @@ const AddTask = () => {
           {/* Read-only user fields */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="userEmail">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="userEmail"
+              >
                 User Email
               </label>
               <input
@@ -226,7 +245,10 @@ const AddTask = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="userName">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="userName"
+              >
                 User Name
               </label>
               <input

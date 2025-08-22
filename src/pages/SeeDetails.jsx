@@ -31,7 +31,9 @@ const SeeDetails = () => {
       setErr("");
       try {
         const res = await fetch(
-          `http://localhost:3000/tasks/${encodeURIComponent(id)}`
+          `https://freelance-server-phi.vercel.app/tasks/${encodeURIComponent(
+            id
+          )}`
         );
         if (!res.ok)
           throw new Error((await res.text()) || "Failed to load task");
@@ -57,7 +59,9 @@ const SeeDetails = () => {
     setPlacing(true);
     try {
       const res = await fetch(
-        `http://localhost:3000/tasks/${encodeURIComponent(id)}/bid`,
+        `https://freelance-server-phi.vercel.app/tasks/${encodeURIComponent(
+          id
+        )}/bid`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -71,7 +75,7 @@ const SeeDetails = () => {
       );
       // ... SweetAlert success ...
     } catch (e) {
-      console.log(e)
+      console.log(e);
     } finally {
       setPlacing(false);
     }

@@ -36,7 +36,9 @@ const Profile = () => {
 
       try {
         const res = await fetch(
-          `http://localhost:3000/users/${encodeURIComponent(email)}`
+          `https://freelance-server-phi.vercel.app/users/${encodeURIComponent(
+            email
+          )}`
         );
 
         if (res.status === 404) {
@@ -92,7 +94,7 @@ const Profile = () => {
   };
 
   const saveUserToBackend = async (payload) => {
-    const res = await fetch("http://localhost:3000/users", {
+    const res = await fetch("https://freelance-server-phi.vercel.app/users", {
       method: "POST", // upsert
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -128,7 +130,8 @@ const Profile = () => {
         photo: form.photo,
         bio: form.bio,
         authProvider:
-          user?.providerData?.[0]?.providerId?.replace(".com", "") || "password",
+          user?.providerData?.[0]?.providerId?.replace(".com", "") ||
+          "password",
         updatedAt: new Date().toISOString(),
       };
       await saveUserToBackend(payload);
@@ -148,7 +151,9 @@ const Profile = () => {
           <h1 className="text-2xl font-semibold text-gray-900">
             You’re not logged in
           </h1>
-          <p className="mt-2 text-gray-600">Please log in to view your profile.</p>
+          <p className="mt-2 text-gray-600">
+            Please log in to view your profile.
+          </p>
           <button
             onClick={() => navigate("/login")}
             className="mt-6 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
@@ -214,7 +219,10 @@ const Profile = () => {
           <div className="mt-8 grid sm:grid-cols-2 gap-6">
             {/* Name */}
             <div className="rounded-2xl border border-gray-100 p-5">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="name">
+              <label
+                className="text-sm font-semibold text-gray-700"
+                htmlFor="name"
+              >
                 Name
               </label>
               <input
@@ -230,7 +238,10 @@ const Profile = () => {
 
             {/* Photo URL */}
             <div className="rounded-2xl border border-gray-100 p-5">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="photo">
+              <label
+                className="text-sm font-semibold text-gray-700"
+                htmlFor="photo"
+              >
                 Photo URL
               </label>
               <input
@@ -249,7 +260,10 @@ const Profile = () => {
 
             {/* Bio */}
             <div className="sm:col-span-2 rounded-2xl border border-gray-100 p-5">
-              <label className="text-sm font-semibold text-gray-700" htmlFor="bio">
+              <label
+                className="text-sm font-semibold text-gray-700"
+                htmlFor="bio"
+              >
                 Bio
               </label>
               <textarea

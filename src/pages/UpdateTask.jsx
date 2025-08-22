@@ -54,12 +54,19 @@ const UpdateTask = () => {
       setLoading(true);
       setErr("");
       try {
-        const res = await fetch(`http://localhost:3000/tasks/${id}`);
-        if (!res.ok) throw new Error((await res.text()) || "Failed to load task");
+        const res = await fetch(
+          `https://freelance-server-phi.vercel.app/tasks/${id}`
+        );
+        if (!res.ok)
+          throw new Error((await res.text()) || "Failed to load task");
         const data = await res.json(); // expects id/_id, title, category, description, deadline, budget, author
         // Ownership check on client for UX (server enforces too)
         const authorEmail = data?.author?.email || "";
-        if (user?.email && authorEmail && user.email.toLowerCase() !== authorEmail.toLowerCase()) {
+        if (
+          user?.email &&
+          authorEmail &&
+          user.email.toLowerCase() !== authorEmail.toLowerCase()
+        ) {
           setErr("You are not allowed to edit this task.");
           setLoading(false);
           return;
@@ -92,8 +99,12 @@ const UpdateTask = () => {
     return (
       <div className="max-w-3xl mx-auto p-6">
         <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-semibold text-gray-900">Please log in</h1>
-          <p className="mt-2 text-gray-600">You need to be logged in to update a task.</p>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Please log in
+          </h1>
+          <p className="mt-2 text-gray-600">
+            You need to be logged in to update a task.
+          </p>
           <button
             onClick={() => navigate("/login")}
             className="mt-6 px-4 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition"
@@ -140,9 +151,9 @@ const UpdateTask = () => {
       };
 
       const res = await fetch(
-        `http://localhost:3000/tasks/${encodeURIComponent(id)}?email=${encodeURIComponent(
-          user.email
-        )}`,
+        `https://freelance-server-phi.vercel.app/tasks/${encodeURIComponent(
+          id
+        )}?email=${encodeURIComponent(user.email)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -161,7 +172,11 @@ const UpdateTask = () => {
       });
       navigate("/my-tasks");
     } catch (e2) {
-      await Swal.fire("Update failed", e2.message || "Something went wrong.", "error");
+      await Swal.fire(
+        "Update failed",
+        e2.message || "Something went wrong.",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -189,7 +204,10 @@ const UpdateTask = () => {
 
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="title">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="title"
+            >
               Task Title
             </label>
             <input
@@ -205,7 +223,10 @@ const UpdateTask = () => {
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="category">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="category"
+            >
               Category
             </label>
             <select
@@ -229,7 +250,10 @@ const UpdateTask = () => {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700" htmlFor="description">
+            <label
+              className="block text-sm font-medium text-gray-700"
+              htmlFor="description"
+            >
               Description
             </label>
             <textarea
@@ -246,7 +270,10 @@ const UpdateTask = () => {
           {/* Deadline & Budget */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="deadline">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="deadline"
+              >
                 Deadline
               </label>
               <input
@@ -260,7 +287,10 @@ const UpdateTask = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="budget">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="budget"
+              >
                 Budget
               </label>
               <input
@@ -280,7 +310,10 @@ const UpdateTask = () => {
           {/* Read-only user fields */}
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="authorEmail">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="authorEmail"
+              >
                 User Email
               </label>
               <input
@@ -292,7 +325,10 @@ const UpdateTask = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700" htmlFor="authorName">
+              <label
+                className="block text-sm font-medium text-gray-700"
+                htmlFor="authorName"
+              >
                 User Name
               </label>
               <input
